@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/aspnetcore-vue/bin/Debug/netcoreapp2.2/aspnetcore-vue.dll",
+            "program": "${workspaceFolder}/AspnetcoreVue/bin/Debug/netcoreapp2.2/AspnetcoreVue.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/aspnetcore-vue",
+            "cwd": "${workspaceFolder}/AspnetcoreVue",
             "stopAtEntry": false,
             "launchBrowser": {
                 "enabled": true
