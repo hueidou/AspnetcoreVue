@@ -1,29 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using AspnetcoreVue.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Serilog;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace AspnetcoreVue
 {
 #pragma warning disable CS1591
+
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly Microsoft.Extensions.Logging.ILogger _logger;
+
+        public Startup(IConfiguration configuration, ILogger<Startup> logger)
         {
             Configuration = configuration;
+            _logger = logger;
+
+            Log.Logger = new LoggerConfiguration()
+              .ReadFrom.Configuration(configuration)
+              .CreateLogger();
         }
 
         public IConfiguration Configuration { get; }
@@ -31,6 +35,9 @@ namespace AspnetcoreVue
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLogging(loggingBuilder =>
+                loggingBuilder.AddSerilog(dispose: true));
+
             services.AddDbContext<AspnetcoreVueContext>(opt =>
                 opt.UseInMemoryDatabase("AspnetcoreVue"));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

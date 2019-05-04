@@ -19,6 +19,21 @@ namespace AspnetcoreVue.Models
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="modelBuilder"></param>
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>().HasIndex(u => u.UserName).IsUnique();
+        }
+
+        /// <summary>
+        /// Users
+        /// </summary>
+        /// <value></value>
+        public DbSet<User> Users {get;set;}
+
+        /// <summary>
+        /// TodoItems
+        /// </summary>
         /// <value></value>
         public DbSet<TodoItem> TodoItems { get; set; }
     }

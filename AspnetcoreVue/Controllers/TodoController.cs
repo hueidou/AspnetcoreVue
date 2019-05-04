@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AspnetcoreVue.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace AspnetcoreVue.Controllers
 {
@@ -16,14 +17,17 @@ namespace AspnetcoreVue.Controllers
     public class TodoController : ControllerBase
     {
         private readonly AspnetcoreVueContext _context;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="context"></param>
-        public TodoController(AspnetcoreVueContext context)
+        /// <param name="logger"></param>
+        public TodoController(AspnetcoreVueContext context, ILogger<TodoController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         /// <summary>
@@ -72,7 +76,7 @@ namespace AspnetcoreVue.Controllers
             _context.TodoItems.Add(item);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetTodoItem), new { id = item.Id }, item);
+            return CreatedAtAction(nameof(GetTodoItem), new { id = item.TodoItemId }, item);
         }
 
         /// <summary>
@@ -87,7 +91,7 @@ namespace AspnetcoreVue.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PutTodoItem(long id, TodoItem item)
         {
-            if (id != item.Id)
+            if (id != item.TodoItemId)
             {
                 return BadRequest();
             }
