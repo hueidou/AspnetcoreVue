@@ -11,6 +11,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Swashbuckle.AspNetCore.Swagger;
+using OpenTracing;
+using Jaeger;
+using Jaeger.Samplers;
+using OpenTracing.Util;
+using System.Net.Http;
 
 namespace AspnetcoreVue
 {
@@ -41,6 +46,28 @@ namespace AspnetcoreVue
             services.AddDbContext<AspnetcoreVueContext>(opt =>
                 opt.UseInMemoryDatabase("AspnetcoreVue"));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            // https://github.com/jaegertracing/jaeger-client-csharp/blob/cd2e3b2c7694a6bb2aaccc195543dc1f10fb13ad/examples/Jaeger.Example.WebApi/Startup.cs
+            // Use "OpenTracing.Contrib.NetCore" to automatically generate spans for ASP.NET Core, Entity Framework Core, ...
+            // See https://github.com/opentracing-contrib/csharp-netcore for details.
+            services.AddOpenTracing();
+            services.AddTransient<HttpClient>();
+
+            // Adds the Jaeger Tracer.
+            services.AddSingleton<ITracer>(serviceProvider =>
+            {
+                string serviceName = serviceProvider.GetRequiredService<IHostingEnvironment>().ApplicationName;
+
+                // This will log to a default localhost installation of Jaeger.
+                var tracer = new Tracer.Builder(serviceName)
+                    .WithSampler(new ConstSampler(true))
+                    .Build();
+
+                // Allows code that can't use DI to also access the tracer.
+                GlobalTracer.Register(tracer);
+
+                return tracer;
+            });
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
